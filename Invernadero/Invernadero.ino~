@@ -1,6 +1,6 @@
-//#include <Ultrasonic.h>
+#include <Ultrasonic.h>
 
-//#include <DHT.h>
+#include <DHT.h>
 
 //VARIABLES DE PRUEVA
 int estado = LOW;
@@ -13,7 +13,7 @@ int estado = LOW;
 //declarando variables ultrasonido
  #define TRIGGER_PIN  3
  #define ECHO_PIN     2
- //Ultrasonic ultrasonic(TRIGGER_PIN, ECHO_PIN);
+ Ultrasonic ultrasonic(TRIGGER_PIN, ECHO_PIN);
  
  //declarando variables relay shield
  int foco = 5;    // Digital Arduino Pin para encender el foco
@@ -26,16 +26,16 @@ int estado = LOW;
  int temp;//temperatura 
  int humedad;//humedad 
  
-// DHT dht (SENSOR, DHT22);
+ DHT dht (SENSOR, DHT22);
  
  //declarando variables PIR
  int LEDPin= 13;
  int PIRPin= 9;
-
+ 
 // the setup routine runs once when you press reset:
 void setup()  {
     
-//    dht.begin();
+    dht.begin();
     Serial.begin(9600);
     
     //declarar pid 4 al 6 como  output:
@@ -51,13 +51,13 @@ void setup()  {
  
 // the loop routine runs over and over again forever:
 void loop()  {
-   ultrasonido();
+  /* ultrasonido();
    Serial.print(""); 
    dth22(); 
-   Serial.print(""); 
-   LDR();  
    Serial.print("");
    pir(); 
+   Serial.print(""); */
+   LDR();  
 }
 
 void dth22()
@@ -117,18 +117,18 @@ void ultrasonido()
   
   delay(1000);
 
-  }   
+  }
   void pir()
 {
   int value= digitalRead(PIRPin);
  
   if (value == HIGH)
   {
-    Serial.println("Alerta humano detectado");
+    Serial.print("Alerta humano detectado")
     digitalWrite(LEDPin, HIGH);
-    delay(100);
+    delay(50);
     digitalWrite(LEDPin, LOW);
-    delay(100);
+    delay(50);
   }
   else
   {
@@ -137,7 +137,7 @@ void ultrasonido()
 }
 void LDR(){
 sensorValue = analogRead(sensorPin); // read the value from the sensor
-if (sensorValue>=980){
+if (ensorValue>1000){
   digitalWrite(foco, HIGH);
   }
 else{
