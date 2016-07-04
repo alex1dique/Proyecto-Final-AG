@@ -1,0 +1,231 @@
+<html>
+<head>
+<title>Invernadero Automatizado </title>
+<script type="text/javascript">
+window.onload=Pinstatus;
+function Pinstatus(){
+morestatus();
+}
+function morestatus(){
+setTimeout(morestatus, 2000);
+document.getElementById("description").innerHTML = "Procesando Estados";
+server = "/arduino/status/99";
+request = new XMLHttpRequest();
+request.onreadystatechange = updateasyncstatus;
+request.open("GET", server, true);
+request.send(null);
+}
+function updateasyncstatus(){
+if ((request.readyState == 4) && (request.status == 200))
+{
+result = request.responseText;
+document.getElementById("description").innerHTML = result;
+fullset = result.split("#");
+document.getElementById("description").innerHTML = fullset;
+for(i = 1; i < fullset.length; i++){
+PinPair = fullset[i];
+singleset = PinPair.split("=");
+PN = singleset[0];
+Pinstatus = singleset[1];
+if (PN >= 7)
+{
+ActNum = "action" + PN;
+ImgNum = "image" + PN;
+if (Pinstatus == 0)
+{
+PinAct = "1";
+image = "off.jpg";
+}
+else
+{
+PinAct = "0";
+image = "on.jpg";
+}
+document.getElementById(ActNum).value = PinAct;
+document.getElementById(ImgNum).src = image;
+}
+if (PN == 2)
+{
+ImgNum = "image" + PN;
+if (Pinstatus == 1)
+{
+image = "led_on.jpg";
+}
+else
+{
+image = "led_off.jpg";
+}
+document.getElementById(ImgNum).src = image;
+}
+if (PN == 3 )
+{
+PinVal = parseInt(singleset[1]);
+DacNum = "dac" + PN;
+ValNum = "valueDac" + PN;
+document.getElementById(DacNum).value = PinVal;
+document.getElementById(ValNum).innerHTML = PinVal;
+}
+
+if (PN.substr(0,1) == "A")
+{
+PinVal = parseFloat(singleset[1]);
+AnalogNum = "analog" + PN.substr(1,2);
+document.getElementById(AnalogNum).value = PinVal;
+}
+}
+}
+}
+function sendbutton(Pin,action){
+document.getElementById("description").innerHTML = "procesando click";
+server = "/arduino/digital/" + Pin + "/" + action;
+request = new XMLHttpRequest();
+request.onreadystatechange = updateasyncbutton;
+request.open("GET", server, true);
+request.send(null);
+}
+function updateasyncbutton(){
+if ((request.readyState == 4) && (request.status == 200))
+{
+result = request.responseText;
+document.getElementById("description").innerHTML = result;
+singleset = result.split(",");
+PinType = singleset[0];
+PinNum = singleset[1];
+Pinstatus = singleset[2];
+ActNum = "action" + PinNum;
+ImgNum = "image" + PinNum;
+if (Pinstatus == 0)
+{
+PinAct = "1";
+image = "off.jpg";
+}
+else
+{
+PinAct = "0";
+image = "on.jpg";
+}
+document.getElementById(ActNum).value = PinAct;
+document.getElementById(ImgNum).src = image;
+document.getElementById("description").innerHTML = result;
+}
+}
+function sendDac(Pin,value){
+ValNum = "valueDac" + Pin;
+document.getElementById(ValNum).innerHTML=value;
+document.getElementById("description").innerHTML = "Processing Slider";
+server = "/arduino/dac/" + Pin + "/" + value;
+request = new XMLHttpRequest();
+request.onreadystatechange = updateasyncDac;
+request.open("GET", server, true);
+request.send(null);
+}
+function updateasyncDac(){
+if ((request.readyState == 4) && (request.status == 200))
+{
+result = request.responseText;
+singleset = result.split(",");
+PinType = singleset[0];
+PinNum = singleset[1];
+PinVal = parseInt(singleset[2]);
+DacNum = "dac" + PinNum;
+ValNum = "valueDac" + PinNum;
+document.getElementById(DacNum).value = PinVal;
+document.getElementById(ValNum).innerHTML = PinVal;
+document.getElementById("description").innerHTML = result;
+}
+}
+</script>
+</head>
+<font face="Arial">
+<table name="Table" border="1" cellpadding="6" align="center">
+<tr> <th align="center" colspan="6" >       INVERNADERO        </th></tr>
+<tr>
+<td align="center">
+<tr> <th align="center" colspan="6" >LDR</th></tr>
+<tr>
+<td align="center">
+
+<br>
+<input type="hidden" name="pin" value="12" id="pin12" />
+<input type="hidden" name="action" value="0" id="action12" />
+<img src="off.jpg" width="50" id="image12" onclick="sendbutton(document.getElementById('pin12').value,document.getElementById('action12').value);"/>
+</td>
+</tr>
+<tr> <th align="center" colspan="6" >PIR</th></tr>
+<tr>
+<td align="center">
+
+<br>
+<input type="hidden" name="pin" value="13" id="pin13" />
+<input type="hidden" name="action" value="0" id="action13" />
+<img src="off.jpg" width="50" id="image13" onclick="sendbutton(document.getElementById('pin13').value,document.getElementById('action13').value);"/>
+</td>
+</tr>
+<tr> <th align="center" colspan="6" >RELAYS</th></tr>
+<tr>
+<td align="center">
+RELAY 1 (secadora)
+<br>
+<input type="hidden" name="pin" value="7" id="pin7" />
+<input type="hidden" name="action" value="0" id="action7" />
+<img src="off.jpg" width="50" id="image7" onclick="sendbutton(document.getElementById('pin7').value,document.getElementById('action7').value);"/>
+</td>
+</tr>
+<tr>
+<td align="center">
+RELAY 2 (bomba)
+<br>
+<input type="hidden" name="pin" value="6" id="pin6" />
+<input type="hidden" name="action" value="0" id="action6" />
+<img src="off.jpg" width="50" id="image6" onclick="sendbutton(document.getElementById('pin6').value,document.getElementById('action6').value);"/>
+</td>
+</tr>
+<tr>
+
+<td align="center">
+
+RELAY 3 (foco)
+
+<br>
+
+<input type="hidden" name="pin" value="5" id="pin5" />
+
+<input type="hidden" name="action" value="0" id="action5" />
+
+<img src="off.jpg" width="50" id="image5" onclick="sendbutton(document.getElementById('pin5').value,document.getElementById('action5').value);"/>
+
+</td>
+
+</tr>
+<tr>
+
+<td align="center">
+
+RELAY 4 (ventilador)
+
+<br>
+
+<input type="hidden" name="pin" value="4" id="pin4" />
+
+<input type="hidden" name="action" value="0" id="action4" />
+
+<img src="off.jpg" width="50" id="image4" onclick="sendbutton(document.getElementById('pin4').value,document.getElementById('action4').value);"/>
+
+</td>
+
+</tr>
+
+<td align="center">
+POWER
+<br>
+<input type="hidden" name="pin" value="10" id="pin10" />
+<input type="hidden" name="action" value="0" id="action10" />
+<img src="off.jpg" width="50" id="image10" onclick="sendbutton(document.getElementById('pin10').value,document.getElementById('action10').value);"/>
+</td>
+</tr>
+</table>
+<br><br>
+<br><br>
+<p id="description"> - </p>
+</font>
+</html>
